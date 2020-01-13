@@ -99,19 +99,32 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "DWYL Quotes"
     , body =
-        [ main_ [ class "pa2" ]
+        [ showHeader
+        , main_ [ class "pa2" ]
             [ h1 [ class "tc" ] [ text <| (String.fromInt <| List.length model.quotes) ++ " Quotes" ]
-            , ul [] (List.map (\q -> showQuote q) model.quotes)
+            , div [] (List.map (\q -> showQuote q) model.quotes)
             ]
         ]
     }
 
 
+showHeader : Html Msg
+showHeader =
+    header [ class "dwyl-bg-teal w-100 ph3 pv3 pv4-ns ph4-m ph5-l" ]
+        [ nav [ class "f5 fw5 tracked" ]
+            [ a [ class "link white dib mr5 b pointer" ] [ text "Get Inspired" ]
+            , a [ class "link white dib mr5 b pointer" ] [ text "All Quotes" ]
+            ]
+        ]
+
+
 showQuote : Quote -> Html Msg
 showQuote quote =
-    li []
-        [ text <| quote.text
-        , span [ class "b" ] [ text quote.author ]
+    article [ class "center mw5 mw6-ns br3 hidden ba b--black-10 mv4" ]
+        [ h1 [ class "f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3" ] [ text quote.author ]
+        , div [ class "pa3 bt b--black-10" ]
+            [ p [ class "f6 f5-ns lh-copy measure" ] [ text quote.text ]
+            ]
         ]
 
 

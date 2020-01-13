@@ -6239,36 +6239,99 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$header = _VirtualDom_node('header');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$showHeader = A2(
+	$elm$html$Html$header,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('dwyl-bg-teal w-100 ph3 pv3 pv4-ns ph4-m ph5-l')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$nav,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('f5 fw5 tracked')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('link white dib mr5 b pointer')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Get Inspired')
+						])),
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('link white dib mr5 b pointer')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('All Quotes')
+						]))
+				]))
+		]));
+var $elm$html$Html$article = _VirtualDom_node('article');
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$Main$showQuote = function (quote) {
 	return A2(
-		$elm$html$Html$li,
-		_List_Nil,
+		$elm$html$Html$article,
 		_List_fromArray(
 			[
-				$elm$html$Html$text(quote.an),
+				$elm$html$Html$Attributes$class('center mw5 mw6-ns br3 hidden ba b--black-10 mv4')
+			]),
+		_List_fromArray(
+			[
 				A2(
-				$elm$html$Html$span,
+				$elm$html$Html$h1,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('b')
+						$elm$html$Html$Attributes$class('f4 bg-near-white br3 br--top black-60 mv0 pv2 ph3')
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text(quote.N)
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('pa3 bt b--black-10')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('f6 f5-ns lh-copy measure')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(quote.an)
+							]))
 					]))
 			]));
 };
-var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$view = function (model) {
 	return {
 		aw: _List_fromArray(
 			[
+				$author$project$Main$showHeader,
 				A2(
 				$elm$html$Html$main_,
 				_List_fromArray(
@@ -6290,7 +6353,7 @@ var $author$project$Main$view = function (model) {
 									$elm$core$List$length(model.E)) + ' Quotes')
 							])),
 						A2(
-						$elm$html$Html$ul,
+						$elm$html$Html$div,
 						_List_Nil,
 						A2(
 							$elm$core$List$map,
