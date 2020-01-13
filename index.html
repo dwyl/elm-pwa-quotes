@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>DWYL Quotes</title>
+        <link rel="manifest" href="./manifest.json">
+        <script src="./elm.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="Description" content="DWYL Quotes">
+        <link rel="apple-touch-icon" href="/assets/images/dwyl180.png">
+        <meta name="theme-color" content="#4BC0A9"/>
+        <link rel="canonical" href="https://elm-quotes.herokuapp.com"/>
+        <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+    </head>
+
+    <body class="">
+        <noscript>
+            <span>This website is using Elm, so it needs js enabled</span>
+        </noscript>        
+
+       <script>
+            var app = Elm.Main.init();
+            
+            if('serviceWorker' in navigator) {
+                navigator.serviceWorker
+                        .register('/service_worker.js')
+                        .then(function() { console.log("Service Worker Registered"); });
+            }
+        </script>
+    </body>
+</html>
