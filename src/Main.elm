@@ -6,7 +6,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Json.Decode as JD
-import Json.Encode as JE
 import Url
 
 
@@ -45,7 +44,7 @@ type alias Quote =
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    ( Model key url [], Cmd.none )
+    ( Model key url [], getQuotes )
 
 
 
@@ -55,6 +54,7 @@ init _ url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | GotQuotes (Result Http.Error (List Quote))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -73,6 +73,14 @@ update msg model =
             , Cmd.none
             )
 
+        GotQuotes result ->
+            case result of
+                Ok quotes ->
+                    ( { model | quotes = quotes }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -88,11 +96,40 @@ subscriptions _ =
 
 
 view : Model -> Browser.Document Msg
-view _ =
+view model =
     { title = "DWYL Quotes"
     , body =
         [ main_ [ class "pa2" ]
-            [ h1 [ class "tc" ] [ text "Quotes" ]
+            [ h1 [ class "tc" ] [ text <| (String.fromInt <| List.length model.quotes) ++ " Quotes" ]
+            , ul [] (List.map (\q -> showQuote q) model.quotes)
             ]
         ]
     }
+
+
+showQuote : Quote -> Html Msg
+showQuote quote =
+    li []
+        [ text <| quote.text
+        , span [ class "b" ] [ text quote.author ]
+        ]
+
+
+getQuotes : Cmd Msg
+getQuotes =
+    Http.get
+        { url = "https://raw.githubusercontent.com/dwyl/quotes/master/quotes.json"
+        , expect = Http.expectJson GotQuotes quotesDecoder
+        }
+
+
+quotesDecoder : JD.Decoder (List Quote)
+quotesDecoder =
+    JD.list quoteDecoder
+
+
+quoteDecoder : JD.Decoder Quote
+quoteDecoder =
+    JD.map2 Quote
+        (JD.field "text" JD.string)
+        (JD.field "author" JD.string)
