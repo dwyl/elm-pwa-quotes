@@ -1,11 +1,13 @@
 module Main exposing (main)
 
+import Array
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Json.Decode as JD
+import Random
 import Url
 
 
@@ -32,7 +34,9 @@ main =
 type alias Model =
     { key : Nav.Key
     , url : Url.Url
+    , page : Page
     , quotes : List Quote
+    , randomQuote : Int
     }
 
 
@@ -42,9 +46,15 @@ type alias Quote =
     }
 
 
+type Page
+    = AllQuotes
+    | RandomQuote
+    | Info
+
+
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    ( Model key url [], getQuotes )
+    ( Model key url AllQuotes [] 0, getQuotes )
 
 
 
@@ -55,6 +65,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | GotQuotes (Result Http.Error (List Quote))
+    | GetRandomQuote Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,8 +80,20 @@ update msg model =
                     ( model, Nav.load href )
 
         UrlChanged url ->
-            ( { model | url = url }
-            , Cmd.none
+            let
+                page =
+                    case url.path of
+                        "/all" ->
+                            AllQuotes
+
+                        "/info" ->
+                            Info
+
+                        _ ->
+                            RandomQuote
+            in
+            ( { model | url = url, page = page }
+            , Random.generate GetRandomQuote (Random.int 0 (List.length model.quotes))
             )
 
         GotQuotes result ->
@@ -80,6 +103,9 @@ update msg model =
 
                 Err _ ->
                     ( model, Cmd.none )
+
+        GetRandomQuote i ->
+            ( { model | randomQuote = i }, Cmd.none )
 
 
 
@@ -100,20 +126,62 @@ view model =
     { title = "DWYL Quotes"
     , body =
         [ showHeader
-        , main_ [ class "pa2" ]
-            [ h1 [ class "tc" ] [ text <| (String.fromInt <| List.length model.quotes) ++ " Quotes" ]
-            , div [] (List.map (\q -> showQuote q) model.quotes)
-            ]
+        , case model.page of
+            AllQuotes ->
+                showAllQuotesPage model
+
+            RandomQuote ->
+                showRandomQuote model
+
+            Info ->
+                showInfoPage
         ]
     }
+
+
+showRandomQuote : Model -> Html Msg
+showRandomQuote model =
+    let
+        quote =
+            Array.get model.randomQuote (Array.fromList model.quotes)
+    in
+    main_ [ class "pa2" ]
+        [ h1 [ class "tc" ] [ text "Random Quote" ]
+        , div []
+            [ case quote of
+                Just q ->
+                    showQuote q
+
+                _ ->
+                    text "No quotes available"
+            , a [ class "tc center mw5 mw6-ns f6 link ph3 pv2 mb2 db white dwyl-bg-teal", href "/" ] [ text "Randomise" ]
+            ]
+        ]
+
+
+showAllQuotesPage : Model -> Html Msg
+showAllQuotesPage model =
+    main_ [ class "pa2" ]
+        [ h1 [ class "tc" ] [ text <| (String.fromInt <| List.length model.quotes) ++ " Quotes" ]
+        , div [] (List.map (\q -> showQuote q) model.quotes)
+        ]
+
+
+showInfoPage : Html Msg
+showInfoPage =
+    main_ [ class "pa2" ]
+        [ p [] [ text "See the following link if you which to add a quote" ]
+        , a [ href "https://github.com/dwyl/quotes#contributing" ] [ text "https://github.com/dwyl/quotes#contributing" ]
+        ]
 
 
 showHeader : Html Msg
 showHeader =
     header [ class "dwyl-bg-teal w-100 ph3 pv3 pv4-ns ph4-m ph5-l" ]
         [ nav [ class "f5 fw5 tracked" ]
-            [ a [ class "link white dib mr5 b pointer" ] [ text "Get Inspired" ]
-            , a [ class "link white dib mr5 b pointer" ] [ text "All Quotes" ]
+            [ a [ class "link white dib mr5 b pointer", href "/" ] [ text "Get Inspired" ]
+            , a [ class "link white dib mr5 b pointer", href "/all" ] [ text "All Quotes" ]
+            , a [ class "link white dib mr5 b pointer", href "/info" ] [ text "Add Quotes" ]
             ]
         ]
 
